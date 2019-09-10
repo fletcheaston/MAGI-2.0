@@ -31,19 +31,19 @@ if __name__ == '__main__':
         buttons = controller.getButtons(xbox)
         triggers = controller.getTriggers(xbox)
         
-        leftSpeed -= translate(triggers["LT"], -1, 1, 0, 250)
-        rightSpeed -= translate(triggers["LT"], -1, 1, 0, 250)
+        leftSpeed += translate(triggers["LT"], -1, 1, 0, 250)
+        rightSpeed += translate(triggers["LT"], -1, 1, 0, 250)
 
-        leftSpeed += translate(triggers["RT"], -1, 1, 0, 250)
-        rightSpeed += translate(triggers["RT"], -1, 1, 0, 250)
+        leftSpeed -= translate(triggers["RT"], -1, 1, 0, 250)
+        rightSpeed -= translate(triggers["RT"], -1, 1, 0, 250)
         
         if(buttons["LB"] == 1):
-            leftSpeed *= 1.5
-            rightSpeed /= 1.5
-    
-        if(buttons["RB"] == 1):
             leftSpeed /= 1.5
             rightSpeed *= 1.5
+    
+        if(buttons["RB"] == 1):
+            leftSpeed *= 1.5
+            rightSpeed /= 1.5
         
         print(leftSpeed, rightSpeed)
 
