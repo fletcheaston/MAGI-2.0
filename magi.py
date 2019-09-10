@@ -6,30 +6,42 @@ import serial
 import time
 import sys
 
+
+def translate(value, leftMin, leftMax, rightMin, rightMax):
+    # Figure out how 'wide' each range is
+    leftSpan = leftMax - leftMin
+    rightSpan = rightMax - rightMin
+
+    # Convert the left range into a 0-1 range (float)
+    valueScaled = float(value - leftMin) / float(leftSpan)
+
+    # Convert the 0-1 range into a value in the right range.
+    return(rightMin + (valueScaled * rightSpan))
+
+
 if __name__ == '__main__':
     controller.init()
-#    motorSerial = serial.Serial('/dev/ttyUSB0', 9600, timeout=0.1)
+    motorSerial = serial.Serial('/dev/ttyUSB0', 9600, timeout=0.1)
     xbox = controller.getController()
     
     while(True):
-        print(controller.getButtons(xbox))
-        print(controller.getTriggers(xbox))
-        time.sleep(0.5)
-
-    while(True):
-        speeds = input("Enter Speeds: ").split(" ")
-
-        if(speeds[0] == "quit"):
-            sys.exit(0)
+        leftSpeed = 0
+        rightSpeed = 0
         
-        if(len(speeds) != 2):
-            print("Error: Incorrect number of speeds given.")
-        else:
-            try:
-                leftSpeed = int(speeds[0])
-                rightSpeed = int(speeds[1])
-                controls.setMotorSpeed(motorSerial, leftSpeed, rightSpeed)
-            except:
-                print("Error: Unable to parse speeds given.")
+        buttons = controller.getButtons(xbox)
+        triggers = controller.getTriggers(xbox)
+        
+        leftSpeed = translate(triggers["LT"], -1, 1, -250, 250)
+        rightSpeed = translate(triggers["RT"], -1, 1, -250, 250)
+        
+        if(buttons["LB"] == 1):
+            leftSpeed *= 1.5
+            rightSpeed /= 1.5
+    
+        if(buttons["RB"] == 1):
+            leftSpeed /= 1.5
+            rightSpeed *= 1.5
+        
+        print(leftSpeed, rightSpeed)
 
-        time.sleep(0.5)
+        controls.setMotorSpeed(motorSerial, leftSpeed, rightSpeed)
